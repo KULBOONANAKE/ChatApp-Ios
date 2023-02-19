@@ -102,24 +102,39 @@ class LoginViewController: UIViewController {
         passwordField.resignFirstResponder()
         
         guard let email = emailField.text, let password = passwordField.text, !email.isEmpty, !password.isEmpty, password.count >= 6 else {
-            alertUserLoginError()
+            alertUserLoginError(message: "")
             return
         }
         
         // Firebase Log In
-        FirebaseAuth.Auth.auth().signIn(withEmail: email, password: password, completion: { authResult, error in
-            guard let result = authResult, error == nil else {
-                print("Failed Login")
+        
+        DatabaseManager.shared.userExists(with: email, completion: { [weak self] exists in
+            guard let strongself = self else {
                 return
             }
             
-            let user = result.user
-            print("Logged In User: \(user)")
+            guard !exists else {
+                strongself.alertUserLoginError(message: "User already exists.")
+                return
+            }
+            FirebaseAuth.Auth.auth().signIn(withEmail: email, password: password, completion: {  authResult, error in
+                guard let result = authResult, error == nil else {
+                    print("Failed Login")
+                    return
+                }
+                
+                let user = result.user
+                print("Logged In User: \(user)")
+                strongself.navigationController?.dismiss(animated: true)
+                
+            })
         })
+        
+        
     }
     
-    func alertUserLoginError(){
-        let alert = UIAlertController(title: "Woops", message: "Please enter all information to Login", preferredStyle: .alert)
+    func alertUserLoginError(message: String){
+        let alert = UIAlertController(title: "Woops", message: message, preferredStyle: .alert)
         
         alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: nil))
         
@@ -147,7 +162,7 @@ extension LoginViewController: UITextFieldDelegate {
         }
         
         return true
-
+        
         
     }
     
