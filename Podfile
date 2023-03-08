@@ -7,9 +7,16 @@ target 'Messager' do
 
   # Pods for Messager
 
+# Firebase
 pod 'Firebase/Core'
 pod 'Firebase/Auth'
 pod 'Firebase/Database'
 
+# Facebook
+pod 'FacebookCore'
+pod 'FacebookLogin'
+pod 'FacebookShare'
 
+# Google Sign In
+pod 'GoogleSignIn'
 end
